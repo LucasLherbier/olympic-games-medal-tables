@@ -38,7 +38,7 @@ def home():
 
 @app.route("/calculate", methods = ['GET', 'POST'])
 def calculate(medals = 3, countries = 10, group = "normal", function = lambda x : x ): 
-    dic_function = {'no_function': lambda x : x, 'square' : np.square, 'log' : np.log}
+    dic_function = {'no_function': lambda x : x, 'square' : np.square, 'log' : lambda x : np.log(x+1), 'sqrt' : lambda x : np.sqrt(x)}
     dic_filter = {'individual':'normal', 'team':'team', 'group':'group'}
     dic_data = {'tokyo' : data_summer_2020 , 'pekin' : data_winter_2022, 'both' : data_both}
     param_data = request.form.get("data")
@@ -60,7 +60,7 @@ def calculate(medals = 3, countries = 10, group = "normal", function = lambda x 
             print("no weight and no function") 
             res = functions_utils.get_best(functions_utils.read_table (data, group, function), medals,countries, True)
         else : 
-            print("no weight and no function") 
+            print("no weight but function") 
             res = functions_utils.get_best(functions_utils.read_table (data, group, function), medals,countries, False)
     headings = tuple(['Country'] + [i for i in range(1,medals+1)]+['Total', 'Rank'])
     return render_template("dahsboard.html", headings = headings, data = res.reset_index().values, parameter = [param_data, param_function, param_group, medals, countries, weight])

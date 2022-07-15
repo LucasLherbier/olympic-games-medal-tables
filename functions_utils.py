@@ -17,25 +17,25 @@ def read_table (data, filter = 'normal', function = lambda x :x) :
     # Build the new dataframe
     if filter not in df.columns : 
         exit(f'La colonne {filter} n est pas présente.')
-    df[filter] = function(df[filter])
     for i in list_ranking : 
         df_table = pd.concat([df_table, df.groupby([i])[filter].sum()], axis = 1)
     df_table.columns = list_ranking
     df_table = df_table.iloc[1:,:].fillna(0).round(0).astype('int64')
 
-    return df_table
+    return function(df_table)
 
-def get_best(df, nb_max = None, top = 20, max = True) :
+
+def get_best(df, nb_max = None, top = 20, max_points = True) :
     # Get only the columns defined as medals
     df_table = df.iloc[:,:nb_max]
     df_table['total'] = df_table.sum(axis=1)
     df_tabl_col = [str(i) for i in df_table.columns][:-1]
-    if max : 
-        df_table['rank'] = df_table.sort_values(df_tabl_col, ascending=False).groupby(df_tabl_col, sort=False).ngroup() + 1
-    else :
+    if max_points : 
         df_table['rank'] = df_table['total'].rank(ascending=False).astype('int64')
+    else :
+        df_table['rank'] = df_table.sort_values(df_tabl_col, ascending=False).groupby(df_tabl_col, sort=False).ngroup() + 1
     df_table = df_table.sort_values(['rank'], ascending=True)
-    return df_table[:top]
+    return df_table[:top].round(2)
 
 
 def get_range(type, medals):
@@ -77,7 +77,7 @@ def weighted_results_max(data,type_weights = 'successive', medals = 3, top = 10,
     new_data['total'] = new_data.sum(axis=1)
     new_data = new_data.sort_values(['total'], ascending=False)
     new_data['rank'] = range(1, new_data.shape[0]+1)
-    return new_data
+    return new_data.round(2)
 
 
 
